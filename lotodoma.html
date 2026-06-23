@@ -6,28 +6,19 @@
 <title>Музыкальное Лото Дома</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap');
-  :root {
-    --bg:#111111; --card:#222222; --border:#2e2e2e; --accent:#f5c842;
-    --text:#ffffff; --muted:#888888; --hit:rgba(245,200,66,0.15); --radius:10px;
-  }
+  :root{--bg:#111111;--card:#222222;--border:#2e2e2e;--accent:#f5c842;--text:#ffffff;--muted:#888888;--hit:rgba(245,200,66,0.15);--radius:10px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
   .screen{display:none;flex-direction:column;min-height:100vh}
   .screen.active{display:flex}
-
-  /* HEADER */
   .app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
   .logo{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
   .logo span{color:var(--accent)}
   .x-btn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px 8px}
-
-  /* BUTTONS */
   .btn{width:100%;padding:16px;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:transform .1s,opacity .1s}
   .btn:active{transform:scale(.97);opacity:.85}
   .btn-y{background:var(--accent);color:#111}
   .btn-o{background:transparent;color:var(--text);border:1px solid var(--border)}
-
-  /* HOME */
   #screen-home{align-items:stretch}
   .home-hero{padding:40px 24px 32px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
   .home-title{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;line-height:1.15;text-transform:uppercase}
@@ -38,8 +29,6 @@
   .vinyl{width:100px;height:100px;border-radius:50%;background:conic-gradient(#1c1c1c 0deg,#2a2a2a 30deg,#1c1c1c 60deg,#2a2a2a 90deg,#1c1c1c 120deg,#2a2a2a 150deg,#1c1c1c 180deg,#2a2a2a 210deg,#1c1c1c 240deg,#2a2a2a 270deg,#1c1c1c 300deg,#2a2a2a 330deg,#1c1c1c 360deg);border:2px solid #333;animation:spin 5s linear infinite;position:absolute}
   .vinyl-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:var(--accent)}
   @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* FORMS */
   .form-inner{padding:24px;display:flex;flex-direction:column;gap:16px;flex:1}
   .code-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center}
   .code-lbl{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
@@ -48,8 +37,6 @@
   .f-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:block}
   .f-input{width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
   .f-input:focus{border-color:var(--accent)}
-
-  /* WIN CONDITION PICKER */
   .win-options{display:flex;flex-direction:column;gap:8px}
   .win-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .2s}
   .win-opt.selected{border-color:var(--accent);background:rgba(245,200,66,0.07)}
@@ -58,8 +45,6 @@
   .win-opt.selected .win-opt-radio::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:#111}
   .win-opt-text{font-size:14px;font-weight:500}
   .win-opt-sub{font-size:11px;color:var(--muted);margin-top:2px}
-
-  /* HOST */
   .sticky-top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border)}
   .host-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
   .code-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Unbounded',sans-serif;font-size:13px;color:var(--accent);letter-spacing:3px}
@@ -82,8 +67,10 @@
   .played-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
   .played-n{font-size:11px;color:var(--muted);min-width:22px;text-align:right;font-family:'Unbounded',sans-serif}
   .played-name{font-size:13px}
-
-  /* PLAYER */
+  .players-list{padding:0 16px 12px;display:flex;flex-direction:column;gap:6px}
+  .player-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+  .player-item-name{font-size:13px;font-weight:600}
+  .player-item-hits{font-size:11px;color:var(--accent);font-family:'Unbounded',sans-serif}
   .player-top{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:20}
   .name-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600}
   .room-pill{font-family:'Unbounded',sans-serif;font-size:11px;color:var(--accent);letter-spacing:2px}
@@ -96,40 +83,36 @@
   .cur-track{margin:6px 12px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);display:none}
   .ct-lbl{font-size:9px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
   .ct-name{font-size:13px;font-weight:600}
-
-  /* GRID */
-  .bingo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:4px 8px}
-  .bingo-cell{aspect-ratio:1/1.15;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:7.5px;line-height:1.25;font-weight:500;padding:3px;color:var(--text);user-select:none;position:relative;transition:all .2s}
-  .bingo-cell.hit{background:var(--hit);border-color:var(--accent);color:var(--accent);font-weight:700}
-  .bingo-cell.hit::after{content:'✓';position:absolute;top:1px;right:2px;font-size:7px;color:var(--accent);font-weight:900}
+  .bingo-grid{display:grid;grid-template-columns:repeat(6,1fr) !important;gap:3px;padding:4px 8px}
+  .bingo-cell{aspect-ratio:1/1.2;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px;color:var(--text);user-select:none;position:relative;transition:all .2s;overflow:hidden}
+  .bingo-cell .artist{font-size:6.5px;font-weight:700;line-height:1.2;color:var(--text);word-break:break-word;hyphens:auto}
+  .bingo-cell .song{font-size:5.5px;color:var(--muted);line-height:1.2;margin-top:1px;word-break:break-word}
+  .bingo-cell.hit{background:var(--hit);border-color:var(--accent)}
+  .bingo-cell.hit .artist{color:var(--accent)}
+  .bingo-cell.hit .song{color:var(--accent);opacity:.7}
+  .bingo-cell.hit::after{content:'✓';position:absolute;top:2px;right:3px;font-size:8px;color:var(--accent);font-weight:900}
   .bingo-cell.winner{background:rgba(245,200,66,0.25);border-color:var(--accent);animation:cpulse .6s ease infinite alternate}
   @keyframes cpulse{from{box-shadow:none}to{box-shadow:0 0 10px rgba(245,200,66,.5)}}
-
-  /* BINGO BUTTON */
   .bingo-wrap{padding:10px 12px 4px}
   .btn-bingo{width:100%;padding:18px;background:var(--accent);color:#111;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;letter-spacing:4px;text-transform:uppercase;cursor:pointer;display:none;animation:bingo-pop .4s cubic-bezier(.34,1.56,.64,1)}
   @keyframes bingo-pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
   .btn-bingo.visible{display:block}
   .hint-text{padding:8px 16px 16px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
-
-  /* WIN OVERLAY */
+  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  .loading-text{font-size:14px;color:var(--muted);font-weight:500}
   #win-overlay{display:none;position:fixed;inset:0;background:rgba(17,17,17,.96);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px}
   #win-overlay.active{display:flex}
   .win-icon{font-size:72px;animation:bounce .5s ease infinite alternate}
   @keyframes bounce{to{transform:translateY(-12px)}}
   .win-title{font-family:'Unbounded',sans-serif;font-size:32px;font-weight:900;color:var(--accent);text-align:center;text-transform:uppercase}
   .win-sub{color:var(--muted);text-align:center;font-size:15px;line-height:1.6}
-
-  /* TOAST */
   .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);border-radius:30px;padding:11px 22px;font-size:13px;font-weight:600;z-index:200;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
   .toast.show{transform:translateX(-50%) translateY(0)}
-
-  /* TRACK FLASH */
   .track-flash{position:fixed;top:0;left:0;right:0;background:var(--card);border-bottom:2px solid var(--accent);padding:12px 20px;z-index:50;transform:translateY(-100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
   .track-flash.show{transform:translateY(0)}
   .tf-lbl{font-size:9px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px}
   .tf-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700}
-
   .confetti-piece{position:fixed;pointer-events:none;z-index:150;animation:cffall 1.5s ease-in forwards}
   @keyframes cffall{0%{transform:translateY(-40px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 </style>
@@ -172,7 +155,7 @@
     </div>
     <div>
       <label class="f-label">Условие победы</label>
-      <div class="win-options" id="win-options">
+      <div class="win-options">
         <div class="win-opt selected" data-val="h" onclick="selectWin(this)">
           <div class="win-opt-radio"></div>
           <div><div class="win-opt-text">1 горизонтальная линия</div><div class="win-opt-sub">Любая строка полностью закрыта</div></div>
@@ -241,8 +224,23 @@
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       style="border-radius:10px;border:1px solid var(--border);display:block"></iframe>
   </div>
+  <div class="sec-head">Игроки онлайн</div>
+  <div class="players-list" id="players-list"></div>
   <div class="sec-head">Сыграно треков</div>
   <div class="played-list" id="played-list"></div>
+</div>
+
+<!-- WAITING -->
+<div id="screen-waiting" class="screen">
+  <div class="app-header">
+    <div class="logo">Музыкальное <span>Лото</span></div>
+    <button class="x-btn" onclick="goHome()">×</button>
+  </div>
+  <div class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Ожидаем начала игры...</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--muted)" id="waiting-info">Игроков: 0</div>
+  </div>
 </div>
 
 <!-- PLAYER GAME -->
@@ -268,7 +266,7 @@
   <div class="hint-text">Треки отмечаются автоматически<br>Соберите условие победы и нажмите БИНГО!</div>
 </div>
 
-<!-- WIN OVERLAY -->
+<!-- WIN -->
 <div id="win-overlay">
   <div class="win-icon">🏆</div>
   <div class="win-title" id="win-title">БИНГО!</div>
@@ -282,7 +280,22 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
+// Firebase init (compat)
+const firebaseConfig = {
+  apiKey: "AIzaSyBEkzMnAsA0U7jGyoFodXayZBLfZKXRZI8",
+  authDomain: "lotodoma-2bb47.firebaseapp.com",
+  databaseURL: "https://lotodoma-2bb47-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lotodoma-2bb47",
+  storageBucket: "lotodoma-2bb47.firebasestorage.app",
+  messagingSenderId: "543623862459",
+  appId: "1:543623862459:web:b915bf61b753fabd6b319e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 const TRACKS = [
   "Алёна Алина — Электричка","Руки Вверх! — Крошка моя","Ласковый Май — Белые Розы",
   "Банд'Эрос — Про красивую жизнь","Верка Сердючка — Гулянка","Quest Pistols — Я твой наркотик",
@@ -314,206 +327,308 @@ const TRACKS = [
   "Катя Лель — Муси-Пуси"
 ];
 
-const WIN_LABELS = {
-  h: '1 горизонтальная линия',
-  v: '1 вертикальная линия',
-  hv: 'Горизонталь + вертикаль',
-  full: 'Весь бланк закрыт'
-};
+const WIN_LABELS = {h:'1 горизонтальная линия',v:'1 вертикальная линия',hv:'Горизонталь + вертикаль',full:'Весь бланк закрыт'};
 
-let G = {
-  roomCode: null, mode: null, playerName: null,
-  card: [], marked: new Set(),
-  winMode: 'h',
-  game: null
-};
+let G = {roomCode:null,mode:null,playerName:null,playerId:null,card:[],marked:new Set(),winMode:'h',shuffledTracks:[],lastTrack:'',currentTrackIndex:-1,_nextBusy:false};
+let listeners = [];
 
-// Shared game state (same tab demo)
-let sharedGame = null;
+function offAll() { listeners.forEach(fn => fn()); listeners = []; }
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
 
-function goHome() {
-  if (sharedGame && sharedGame._poll) clearInterval(sharedGame._poll);
-  sharedGame = null; G.marked = new Set();
+window.goHome = function() {
+  offAll();
+  if (G.mode === 'player' && G.roomCode && G.playerId) {
+    db.ref(`rooms/${G.roomCode}/players/${G.playerId}`).remove();
+  }
+  G = {roomCode:null,mode:null,playerName:null,playerId:null,card:[],marked:new Set(),winMode:'h',shuffledTracks:[],lastTrack:''};
   showScreen('home');
 }
 
-function selectWin(el) {
+window.selectWin = function(el) {
   document.querySelectorAll('.win-opt').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
   G.winMode = el.dataset.val;
 }
 
-function showCreate() {
+window.showCreate = function() {
   const code = Math.random().toString(36).slice(2,6).toUpperCase();
   G.roomCode = code;
   document.getElementById('room-code-display').textContent = code;
   showScreen('create');
 }
 
-function showJoin() { showScreen('join'); }
+window.showJoin = function() { showScreen('join'); }
 
-function startHost() {
+// ---- HOST ----
+window.startHost = function() {
   G.mode = 'host';
   G.playerName = document.getElementById('host-name').value || 'Ведущий';
-  sharedGame = { shuffled: shuffle([...TRACKS]), idx: -1, played: [], winMode: G.winMode };
+  G.shuffledTracks = shuffle([...TRACKS]);
+
+  db.ref(`rooms/${G.roomCode}`).set({
+    status: 'waiting',
+    winMode: G.winMode,
+    currentTrackIndex: -1,
+    currentTrack: '',
+    playedCount: 0,
+    shuffledTracks: G.shuffledTracks
+  });
+
   document.getElementById('h-code').textContent = G.roomCode;
-  document.getElementById('h-players').textContent = '👥 0';
   document.getElementById('h-win-mode').textContent = WIN_LABELS[G.winMode];
   document.getElementById('played-list').innerHTML = '';
+  document.getElementById('players-list').innerHTML = '';
   document.getElementById('np-track').textContent = 'Нажмите «Следующий трек»';
   document.getElementById('np-num').textContent = 'Трек 0 из ' + TRACKS.length;
   document.getElementById('np-prog').style.width = '0%';
+
+  G.lastDisplayedIdx = -1;
+
+  // Listen players
+  const pRef = db.ref(`rooms/${G.roomCode}/players`);
+  const u1 = pRef.on('value', snap => {
+    const players = snap.val() || {};
+    const count = Object.keys(players).length;
+    document.getElementById('h-players').textContent = `👥 ${count}`;
+    const list = document.getElementById('players-list');
+    list.innerHTML = '';
+    Object.values(players).forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'player-item';
+      el.innerHTML = `<span class="player-item-name">👤 ${p.name}</span><span class="player-item-hits">${p.hits||0} треков</span>`;
+      list.appendChild(el);
+    });
+  });
+  listeners.push(() => pRef.off('value', u1));
+
+  // Listen winner
+  const wRef = db.ref(`rooms/${G.roomCode}/winner`);
+  const u2 = wRef.on('value', snap => {
+    if (snap.val()) {
+      const w = snap.val();
+      showWinOverlay(w.name);
+    }
+  });
+  listeners.push(() => wRef.off('value', u2));
+
   showScreen('host');
-  toast('🎮 Код игры: ' + G.roomCode);
+  toast('🎮 Игра создана! Код: ' + G.roomCode);
 }
 
-function nextTrack() {
-  if (!sharedGame) return;
-  sharedGame.idx++;
-  if (sharedGame.idx >= sharedGame.shuffled.length) { toast('🎉 Все треки сыграны!'); return; }
-  const track = sharedGame.shuffled[sharedGame.idx];
-  sharedGame.played.push(track);
-  const n = sharedGame.idx + 1, total = sharedGame.shuffled.length;
+window.nextTrack = function() {
+  if (G._nextBusy) return;
+  G._nextBusy = true;
+  setTimeout(() => G._nextBusy = false, 1000);
+
+  G.currentTrackIndex = (G.currentTrackIndex || -1) + 1;
+  const nextIdx = G.currentTrackIndex;
+
+  if (nextIdx >= G.shuffledTracks.length) { toast('🎉 Все треки сыграны!'); G._nextBusy = false; return; }
+  const track = G.shuffledTracks[nextIdx];
+  const n = nextIdx + 1;
+
+  db.ref(`rooms/${G.roomCode}`).update({
+    currentTrackIndex: nextIdx,
+    currentTrack: track,
+    playedCount: n,
+    status: 'playing'
+  });
+
   document.getElementById('np-track').textContent = track;
-  document.getElementById('np-num').textContent = 'Трек ' + n + ' из ' + total;
-  document.getElementById('np-prog').style.width = (n/total*100) + '%';
-  const list = document.getElementById('played-list');
-  const el = document.createElement('div');
-  el.className = 'played-item';
-  el.innerHTML = `<span class="played-n">${n}</span><span class="played-name">${track}</span>`;
-  list.insertBefore(el, list.firstChild);
+  document.getElementById('np-num').textContent = `Трек ${n} из ${TRACKS.length}`;
+  document.getElementById('np-prog').style.width = (n/TRACKS.length*100) + '%';
+
+  // Only add to list if not already shown
+  if (n > (G.lastDisplayedIdx || 0)) {
+    G.lastDisplayedIdx = n;
+    const list = document.getElementById('played-list');
+    const el = document.createElement('div');
+    el.className = 'played-item';
+    el.innerHTML = `<span class="played-n">${n}</span><span class="played-name">${track}</span>`;
+    list.insertBefore(el, list.firstChild);
+  }
   flashTrack(track);
-  // Auto-mark on player card
-  autoMarkTrack(track);
 }
 
-function joinGame() {
+// ---- PLAYER ----
+window.joinGame = function() {
   const code = document.getElementById('join-code').value.toUpperCase().trim();
   const name = document.getElementById('player-name').value.trim() || 'Игрок';
   if (code.length < 3) { toast('Введите код комнаты'); return; }
-  G.mode = 'player'; G.roomCode = code; G.playerName = name;
-  G.marked = new Set();
-  // Get win mode from shared game or default
-  G.winMode = sharedGame ? sharedGame.winMode : 'h';
-  // Generate 36 random tracks from 80
-  G.card = shuffle([...TRACKS]).slice(0, 36);
-  document.getElementById('p-name').textContent = name;
-  document.getElementById('p-room').textContent = code;
-  document.getElementById('p-win-mode').textContent = WIN_LABELS[G.winMode];
-  renderGrid();
-  updateStats();
-  showScreen('player');
-  toast('✅ Вы в игре!');
-  // Init shared game if joining fresh
-  if (!sharedGame) sharedGame = { shuffled: shuffle([...TRACKS]), idx: -1, played: [], winMode: G.winMode };
-  // Poll for new tracks
-  let last = sharedGame.idx;
-  sharedGame._poll = setInterval(() => {
-    if (sharedGame && sharedGame.idx > last) {
-      last = sharedGame.idx;
-      updateStats();
-    }
-  }, 300);
+
+  db.ref(`rooms/${code}`).once('value', snap => {
+    if (!snap.exists()) { toast('❌ Комната не найдена'); return; }
+    const room = snap.val();
+
+    G.roomCode = code;
+    G.playerName = name;
+    G.mode = 'player';
+    G.winMode = room.winMode || 'h';
+    G.shuffledTracks = room.shuffledTracks || shuffle([...TRACKS]);
+    G.card = shuffle([...TRACKS]).slice(0, 36);
+    G.marked = new Set();
+    G.lastTrack = '';
+
+    // Register player
+    const pRef = db.ref(`rooms/${code}/players`).push();
+    G.playerId = pRef.key;
+    pRef.set({ name, hits: 0 });
+
+    document.getElementById('p-name').textContent = name;
+    document.getElementById('p-room').textContent = code;
+    document.getElementById('p-win-mode').textContent = WIN_LABELS[G.winMode];
+    renderGrid();
+    updateStats();
+
+    showScreen('waiting');
+
+    // Listen players count for waiting screen
+    const pCountRef = db.ref(`rooms/${code}/players`);
+    const u0 = pCountRef.on('value', snap => {
+      const count = Object.keys(snap.val()||{}).length;
+      const el = document.getElementById('waiting-info');
+      if (el) el.textContent = `Игроков подключилось: ${count}`;
+    });
+    listeners.push(() => pCountRef.off('value', u0));
+
+    // Listen room for track changes
+    const roomRef = db.ref(`rooms/${code}`);
+    let firstLoad = true;
+    const u1 = roomRef.on('value', snap => {
+      if (!snap.exists()) return;
+      const r = snap.val();
+
+      // Switch to player screen when playing
+      if ((r.status === 'playing' || r.currentTrackIndex >= 0) &&
+          document.getElementById('screen-waiting').classList.contains('active')) {
+        showScreen('player');
+      }
+
+      if (firstLoad) {
+        // On first load: mark ALL already played tracks
+        firstLoad = false;
+        if (r.shuffledTracks && r.currentTrackIndex >= 0) {
+          const alreadyPlayed = r.shuffledTracks.slice(0, r.currentTrackIndex + 1);
+          alreadyPlayed.forEach(t => autoMarkTrack(t));
+        }
+        if (r.currentTrack) {
+          G.lastTrack = r.currentTrack;
+          const ct = document.getElementById('cur-track');
+          if (ct) { ct.style.display = 'block'; document.getElementById('ct-name').textContent = r.currentTrack; }
+        }
+      } else {
+        // New track arrived
+        if (r.currentTrack && r.currentTrack !== G.lastTrack) {
+          G.lastTrack = r.currentTrack;
+          autoMarkTrack(r.currentTrack);
+          const ct = document.getElementById('cur-track');
+          if (ct) { ct.style.display = 'block'; document.getElementById('ct-name').textContent = r.currentTrack; }
+          flashTrack(r.currentTrack);
+        }
+      }
+
+      // Update stats
+      const sp = document.getElementById('s-played');
+      const sl = document.getElementById('s-left');
+      if (sp) sp.textContent = r.playedCount || 0;
+      if (sl) sl.textContent = TRACKS.length - (r.playedCount || 0);
+
+      // Check winner
+      if (r.winner) showWinOverlay(r.winner.name);
+    });
+    listeners.push(() => roomRef.off('value', u1));
+
+    toast('✅ Вы в игре! Ждём ведущего...');
+  });
 }
 
 function renderGrid() {
   const grid = document.getElementById('bingo-grid');
   grid.innerHTML = '';
   G.card.forEach((t, i) => {
+    const parts = t.split(' — ');
     const c = document.createElement('div');
     c.className = 'bingo-cell';
     c.id = 'cell' + i;
-    // Short display: artist on first line, song on second
-    const parts = t.split(' — ');
-    c.innerHTML = `<span>${parts[0]}</span>${parts[1] ? `<br><span style="color:var(--muted)">${parts[1]}</span>` : ''}`;
+    c.innerHTML = `<div class="artist">${parts[0]||''}</div><div class="song">${parts[1]||''}</div>`;
     grid.appendChild(c);
   });
 }
 
-// AUTO-MARK: called when host plays a track
 function autoMarkTrack(track) {
-  if (G.mode !== 'player') return;
+  if (!track) return;
+  const trackClean = track.trim();
+  let changed = false;
   G.card.forEach((t, i) => {
-    if (t === track && !G.marked.has(i)) {
+    if (t.trim() === trackClean && !G.marked.has(i)) {
       G.marked.add(i);
+      changed = true;
       const cell = document.getElementById('cell' + i);
       if (cell) {
         cell.classList.add('hit');
         cell.style.transform = 'scale(1.1)';
-        setTimeout(() => cell.style.transform = '', 300);
+        setTimeout(() => cell.style.transform = '', 350);
       }
     }
   });
-  // Show current track
-  const ct = document.getElementById('cur-track');
-  if (ct) { ct.style.display = 'block'; document.getElementById('ct-name').textContent = track; }
-  updateStats();
-  checkBingo();
+  if (changed) {
+    document.getElementById('s-hit').textContent = G.marked.size;
+    if (G.roomCode && G.playerId) {
+      db.ref(`rooms/${G.roomCode}/players/${G.playerId}`).update({ hits: G.marked.size });
+    }
+    checkBingo();
+  }
 }
 
 function updateStats() {
   document.getElementById('s-hit').textContent = G.marked.size;
-  const p = sharedGame ? sharedGame.played.length : 0;
-  document.getElementById('s-played').textContent = p;
-  document.getElementById('s-left').textContent = TRACKS.length - p;
 }
 
-// WIN CHECK
-function getHLines() { // horizontal lines
-  const lines = [];
-  for (let r=0; r<6; r++) lines.push([...Array(6)].map((_,c) => r*6+c));
-  return lines;
-}
-function getVLines() { // vertical lines
-  const lines = [];
-  for (let c=0; c<6; c++) lines.push([...Array(6)].map((_,r) => r*6+c));
-  return lines;
-}
+function getHLines() { return [...Array(6)].map((_,r)=>[...Array(6)].map((_,c)=>r*6+c)); }
+function getVLines() { return [...Array(6)].map((_,c)=>[...Array(6)].map((_,r)=>r*6+c)); }
 
 function checkBingo() {
   const mode = G.winMode;
-  let won = false;
-  let winCells = [];
-
-  if (mode === 'h') {
-    for (const line of getHLines()) {
-      if (line.every(i => G.marked.has(i))) { won = true; winCells = line; break; }
-    }
-  } else if (mode === 'v') {
-    for (const line of getVLines()) {
-      if (line.every(i => G.marked.has(i))) { won = true; winCells = line; break; }
-    }
-  } else if (mode === 'hv') {
-    let hLine = null, vLine = null;
-    for (const line of getHLines()) { if (line.every(i => G.marked.has(i))) { hLine = line; break; } }
-    for (const line of getVLines()) { if (line.every(i => G.marked.has(i))) { vLine = line; break; } }
-    if (hLine && vLine) { won = true; winCells = [...new Set([...hLine, ...vLine])]; }
-  } else if (mode === 'full') {
-    if (G.marked.size >= 36) { won = true; winCells = [...Array(36).keys()]; }
+  let won = false, winCells = [];
+  if (mode==='h') { for(const l of getHLines()){if(l.every(i=>G.marked.has(i))){won=true;winCells=l;break;}} }
+  else if (mode==='v') { for(const l of getVLines()){if(l.every(i=>G.marked.has(i))){won=true;winCells=l;break;}} }
+  else if (mode==='hv') {
+    let h=null,v=null;
+    for(const l of getHLines()){if(l.every(i=>G.marked.has(i))){h=l;break;}}
+    for(const l of getVLines()){if(l.every(i=>G.marked.has(i))){v=l;break;}}
+    if(h&&v){won=true;winCells=[...new Set([...h,...v])];}
   }
+  else if (mode==='full'){if(G.marked.size>=36){won=true;winCells=[...Array(36).keys()];}}
 
   if (won) {
-    winCells.forEach(i => {
-      const c = document.getElementById('cell' + i);
-      if (c) c.classList.add('winner');
-    });
+    winCells.forEach(i=>{const c=document.getElementById('cell'+i);if(c)c.classList.add('winner');});
     document.getElementById('bingo-btn').classList.add('visible');
+  }
+  return won;
+}
+
+window.claimBingo = function() {
+  if (checkBingo()) {
+    db.ref(`rooms/${G.roomCode}/winner`).set({ name: G.playerName, playerId: G.playerId });
+    confetti();
+    showWinOverlay(G.playerName);
+  } else {
+    toast('❌ Нет полной линии!');
   }
 }
 
-function claimBingo() {
-  confetti();
+function showWinOverlay(winnerName) {
   document.getElementById('win-title').textContent = '🏆 БИНГО!';
-  document.getElementById('win-sub').textContent = G.playerName + ' победил(а)!\n' + WIN_LABELS[G.winMode];
+  document.getElementById('win-sub').textContent = winnerName + ' победил(а)!';
   document.getElementById('win-overlay').classList.add('active');
+  if (winnerName === G.playerName) confetti();
 }
 
-function closeWin() {
+window.closeWin = function() {
   document.getElementById('win-overlay').classList.remove('active');
   goHome();
 }
@@ -522,7 +637,8 @@ function flashTrack(track) {
   const f = document.getElementById('track-flash');
   document.getElementById('tf-name').textContent = track;
   f.classList.add('show');
-  setTimeout(() => f.classList.remove('show'), 2500);
+  clearTimeout(f._t);
+  f._t = setTimeout(() => f.classList.remove('show'), 2500);
 }
 
 function toast(msg) {
@@ -535,19 +651,19 @@ function toast(msg) {
 
 function confetti() {
   const colors = ['#f5c842','#ffffff','#111111','#d4a820','#aaaaaa'];
-  for (let i=0; i<55; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `left:${Math.random()*100}vw;top:-20px;background:${colors[~~(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()}s`;
+  for(let i=0;i<55;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${colors[~~(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()}s`;
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 2000);
-    }, i*28);
+      setTimeout(()=>el.remove(),2000);
+    },i*28);
   }
 }
 
 function shuffle(arr) {
-  for (let i=arr.length-1; i>0; i--) { const j=~~(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  for(let i=arr.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
   return arr;
 }
 </script>
