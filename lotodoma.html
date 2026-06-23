@@ -638,8 +638,75 @@ window.closeWin = function() {
 
 // ========== YOUTUBE PLAYER ==========
 const YT_API_KEY = 'AIzaSyChhAm292saJen85Lghv9bIlNLjMnSnT-Q';
+const YT_PLAYLIST_ID = 'PLgyHMazRltI9veJda6TcpUh-J9PvdQxSN';
 let ytPlayer = null;
 let ytReady = false;
+let playlistVideos = {}; // { normalized_title: videoId }
+
+// Load all videos from playlist into memory
+function loadPlaylist() {
+  const status = document.getElementById('yt-status');
+  if (status) status.textContent = '⏳ Загружаем плейлист...';
+
+  function fetchPage(pageToken) {
+    let url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=' +
+      YT_PLAYLIST_ID + '&maxResults=50&key=' + YT_API_KEY;
+    if (pageToken) url += '&pageToken=' + pageToken;
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) {
+          if (status) status.textContent = '❌ Ошибка загрузки плейлиста';
+          return;
+        }
+        data.items.forEach(item => {
+          const title = item.snippet.title;
+          const videoId = item.snippet.resourceId.videoId;
+          // Store by normalized title for fuzzy matching
+          playlistVideos[normalizeTitle(title)] = videoId;
+        });
+        if (data.nextPageToken) {
+          fetchPage(data.nextPageToken);
+        } else {
+          const count = Object.keys(playlistVideos).length;
+          if (status) status.textContent = '✅ Плейлист загружен: ' + count + ' треков';
+          setTimeout(() => { if (status) status.textContent = ''; }, 2000);
+        }
+      })
+      .catch(() => {
+        if (status) status.textContent = '❌ Ошибка загрузки';
+      });
+  }
+  fetchPage(null);
+}
+
+function normalizeTitle(t) {
+  return t.toLowerCase()
+    .replace(/[–—-]/g, ' ')
+    .replace(/[^\w\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function findVideoInPlaylist(trackName) {
+  const norm = normalizeTitle(trackName);
+  // Try exact match first
+  if (playlistVideos[norm]) return playlistVideos[norm];
+  // Try partial match
+  const keys = Object.keys(playlistVideos);
+  for (const key of keys) {
+    if (key.includes(norm) || norm.includes(key)) return playlistVideos[key];
+  }
+  // Try matching by artist or song name separately
+  const parts = norm.split(' ');
+  for (const key of keys) {
+    if (parts.filter(p => p.length > 3).every(p => key.includes(p))) {
+      return playlistVideos[key];
+    }
+  }
+  return null;
+}
 
 window.onYouTubeIframeAPIReady = function() {
   ytReady = true;
@@ -655,6 +722,7 @@ window.onYouTubeIframeAPIReady = function() {
     events: {
       onReady: function() {
         document.getElementById('yt-player-wrap').style.display = 'block';
+        loadPlaylist();
       },
       onError: function(e) {
         // Error codes: 2=invalid, 5=html5, 100=not found, 101/150/153=embedding not allowed
@@ -673,18 +741,20 @@ G._lastSearchSkip = 0;
 G._searchResults = [];
 
 function searchAndPlay(query, skipIndex) {
-  skipIndex = skipIndex || 0;
-  G._lastSearchQuery = query;
-  G._lastSearchSkip = skipIndex;
-
   const status = document.getElementById('yt-status');
 
-  // If we already have results cached, use them
-  if (skipIndex > 0 && G._searchResults.length > skipIndex) {
-    tryVideo(G._searchResults[skipIndex], status);
+  // First try to find in playlist
+  const videoId = findVideoInPlaylist(query);
+  if (videoId) {
+    if (status) status.textContent = '▶ ' + query;
+    playVideoById(videoId);
     return;
   }
 
+  // Fallback: search YouTube
+  skipIndex = skipIndex || 0;
+  G._lastSearchQuery = query;
+  G._lastSearchSkip = skipIndex;
   if (status) status.textContent = '🔍 Ищем: ' + query;
 
   fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&q=' +
@@ -693,31 +763,28 @@ function searchAndPlay(query, skipIndex) {
   .then(r => r.json())
   .then(data => {
     if (data.error) {
-      if (status) status.textContent = '❌ Ошибка API: ' + data.error.message;
+      if (status) status.textContent = '❌ ' + data.error.message;
       return;
     }
-    if (data.items && data.items.length > 0) {
+    if (data.items && data.items.length > skipIndex) {
       G._searchResults = data.items;
-      tryVideo(data.items[skipIndex] || data.items[0], status);
+      const item = data.items[skipIndex];
+      if (status) status.textContent = '▶ ' + item.snippet.title;
+      playVideoById(item.id.videoId);
     } else {
       if (status) status.textContent = '❌ Не найдено: ' + query;
     }
   })
-  .catch(err => {
+  .catch(() => {
     if (status) status.textContent = '❌ Ошибка поиска';
-    console.error(err);
   });
 }
 
-function tryVideo(item, status) {
-  if (!item) return;
-  const videoId = item.id.videoId;
-  const title = item.snippet.title;
-  if (status) status.textContent = '▶ ' + title;
+function playVideoById(videoId) {
   if (ytPlayer && ytReady) {
     ytPlayer.loadVideoById(videoId);
   } else {
-    setTimeout(() => { if (ytPlayer) ytPlayer.loadVideoById(videoId); }, 2000);
+    setTimeout(() => { if (ytPlayer) ytPlayer.loadVideoById(videoId); }, 1500);
   }
 }
 
