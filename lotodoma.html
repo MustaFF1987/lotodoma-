@@ -419,6 +419,7 @@ window.startHost = function() {
 
   showScreen('host');
   toast('🎮 Игра создана! Код: ' + G.roomCode);
+  loadPlaylist();
 }
 
 window.nextTrack = function() {
@@ -710,9 +711,19 @@ function findVideoInPlaylist(trackName) {
 
 window.onYouTubeIframeAPIReady = function() {
   ytReady = true;
+  // Don't create player yet - wait until host starts game
+};
+
+function initYTPlayer(videoId) {
+  if (ytPlayer) {
+    ytPlayer.loadVideoById(videoId);
+    return;
+  }
+  document.getElementById('yt-player-wrap').style.display = 'block';
   ytPlayer = new YT.Player('yt-player', {
     height: '160',
     width: '100%',
+    videoId: videoId,
     playerVars: {
       autoplay: 1,
       controls: 1,
@@ -720,12 +731,10 @@ window.onYouTubeIframeAPIReady = function() {
       modestbranding: 1
     },
     events: {
-      onReady: function() {
-        document.getElementById('yt-player-wrap').style.display = 'block';
-        loadPlaylist();
+      onReady: function(e) {
+        e.target.playVideo();
       },
       onError: function(e) {
-        // Error codes: 2=invalid, 5=html5, 100=not found, 101/150/153=embedding not allowed
         const status = document.getElementById('yt-status');
         if (status) status.textContent = '⏭ Видео недоступно, пробуем следующее...';
         setTimeout(() => {
@@ -734,7 +743,7 @@ window.onYouTubeIframeAPIReady = function() {
       }
     }
   });
-};
+}
 
 G._lastSearchQuery = '';
 G._lastSearchSkip = 0;
@@ -781,11 +790,7 @@ function searchAndPlay(query, skipIndex) {
 }
 
 function playVideoById(videoId) {
-  if (ytPlayer && ytReady) {
-    ytPlayer.loadVideoById(videoId);
-  } else {
-    setTimeout(() => { if (ytPlayer) ytPlayer.loadVideoById(videoId); }, 1500);
-  }
+  initYTPlayer(videoId);
 }
 
 function flashTrack(track) {
