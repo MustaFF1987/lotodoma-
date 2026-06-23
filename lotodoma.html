@@ -759,12 +759,8 @@ function playTrackOnYoutube(trackName) {
       btn.textContent = '▶ ' + trackName;
     }
     if (status) { status.style.display = 'block'; status.textContent = '🎵 Открывается в отдельном окне'; }
-    // Open in named window - reuses same window each time
-    if (window._ytWin && !window._ytWin.closed) {
-      window._ytWin.location.href = url;
-    } else {
-      window._ytWin = window.open(url, 'ytwindow', 'width=800,height=600,left=100,top=100');
-    }
+    // Open in named window - browser reuses same window automatically
+    window.open(url, 'ytwindow', 'width=800,height=600,left=100,top=100');
   } else {
     if (status) { status.style.display = 'block'; status.textContent = '❌ Не найдено: ' + trackName; }
   }
