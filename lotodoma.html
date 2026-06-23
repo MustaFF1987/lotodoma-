@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Музыкальное Лото Дома</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap');
+  :root {
+    --bg:#111111; --card:#222222; --border:#2e2e2e; --accent:#f5c842;
+    --text:#ffffff; --muted:#888888; --hit:rgba(245,200,66,0.15); --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+  .screen{display:none;flex-direction:column;min-height:100vh}
+  .screen.active{display:flex}
+
+  /* HEADER */
+  .app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+  .logo{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .logo span{color:var(--accent)}
+  .x-btn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px 8px}
+
+  /* BUTTONS */
+  .btn{width:100%;padding:16px;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:transform .1s,opacity .1s}
+  .btn:active{transform:scale(.97);opacity:.85}
+  .btn-y{background:var(--accent);color:#111}
+  .btn-o{background:transparent;color:var(--text);border:1px solid var(--border)}
+
+  /* HOME */
+  #screen-home{align-items:stretch}
+  .home-hero{padding:40px 24px 32px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+  .home-title{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;line-height:1.15;text-transform:uppercase}
+  .home-title em{color:var(--accent);font-style:normal}
+  .home-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:300px}
+  .home-actions{display:flex;flex-direction:column;gap:10px;padding:0 24px 40px}
+  .vinyl-wrap{position:relative;width:100px;height:100px}
+  .vinyl{width:100px;height:100px;border-radius:50%;background:conic-gradient(#1c1c1c 0deg,#2a2a2a 30deg,#1c1c1c 60deg,#2a2a2a 90deg,#1c1c1c 120deg,#2a2a2a 150deg,#1c1c1c 180deg,#2a2a2a 210deg,#1c1c1c 240deg,#2a2a2a 270deg,#1c1c1c 300deg,#2a2a2a 330deg,#1c1c1c 360deg);border:2px solid #333;animation:spin 5s linear infinite;position:absolute}
+  .vinyl-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:var(--accent)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* FORMS */
+  .form-inner{padding:24px;display:flex;flex-direction:column;gap:16px;flex:1}
+  .code-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center}
+  .code-lbl{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+  .code-val{font-family:'Unbounded',sans-serif;font-size:44px;font-weight:900;color:var(--accent);letter-spacing:8px}
+  .code-hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .f-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:block}
+  .f-input{width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+  .f-input:focus{border-color:var(--accent)}
+
+  /* WIN CONDITION PICKER */
+  .win-options{display:flex;flex-direction:column;gap:8px}
+  .win-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .2s}
+  .win-opt.selected{border-color:var(--accent);background:rgba(245,200,66,0.07)}
+  .win-opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .2s;position:relative}
+  .win-opt.selected .win-opt-radio{border-color:var(--accent);background:var(--accent)}
+  .win-opt.selected .win-opt-radio::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:#111}
+  .win-opt-text{font-size:14px;font-weight:500}
+  .win-opt-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+  /* HOST */
+  .sticky-top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border)}
+  .host-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+  .code-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Unbounded',sans-serif;font-size:13px;color:var(--accent);letter-spacing:3px}
+  .players-pill{background:var(--accent);color:#111;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700}
+  .win-pill{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;margin:0 16px 10px;font-size:12px;color:var(--muted)}
+  .win-pill span{color:var(--accent);font-weight:600}
+  .now-playing{margin:0 16px 10px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--accent)}
+  .np-eye{font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:5px}
+  .np-track{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;line-height:1.3}
+  .np-num{font-size:11px;color:var(--muted);margin-top:4px}
+  .prog-bar{height:2px;background:var(--border);margin:0 16px 10px;border-radius:1px;overflow:hidden}
+  .prog-fill{height:100%;background:var(--accent);transition:width .4s}
+  .host-ctrl{display:flex;gap:8px;padding:0 16px 12px}
+  .btn-next{flex:1;padding:14px;background:var(--accent);color:#111;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+  .btn-next:active{opacity:.8}
+  .btn-exit{padding:14px 16px;background:var(--card);color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:18px}
+  .spotify-wrap{padding:0 16px 12px}
+  .sec-head{padding:4px 16px 8px;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+  .played-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:6px}
+  .played-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+  .played-n{font-size:11px;color:var(--muted);min-width:22px;text-align:right;font-family:'Unbounded',sans-serif}
+  .played-name{font-size:13px}
+
+  /* PLAYER */
+  .player-top{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:20}
+  .name-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600}
+  .room-pill{font-family:'Unbounded',sans-serif;font-size:11px;color:var(--accent);letter-spacing:2px}
+  .stats-row{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+  .stat-box{flex:1;background:var(--bg);padding:10px 8px;text-align:center}
+  .stat-num{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--accent)}
+  .stat-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+  .win-mode-bar{margin:8px 12px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);font-size:12px;color:var(--muted)}
+  .win-mode-bar b{color:var(--accent)}
+  .cur-track{margin:6px 12px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);display:none}
+  .ct-lbl{font-size:9px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+  .ct-name{font-size:13px;font-weight:600}
+
+  /* GRID */
+  .bingo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:4px 8px}
+  .bingo-cell{aspect-ratio:1/1.15;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:7.5px;line-height:1.25;font-weight:500;padding:3px;color:var(--text);user-select:none;position:relative;transition:all .2s}
+  .bingo-cell.hit{background:var(--hit);border-color:var(--accent);color:var(--accent);font-weight:700}
+  .bingo-cell.hit::after{content:'✓';position:absolute;top:1px;right:2px;font-size:7px;color:var(--accent);font-weight:900}
+  .bingo-cell.winner{background:rgba(245,200,66,0.25);border-color:var(--accent);animation:cpulse .6s ease infinite alternate}
+  @keyframes cpulse{from{box-shadow:none}to{box-shadow:0 0 10px rgba(245,200,66,.5)}}
+
+  /* BINGO BUTTON */
+  .bingo-wrap{padding:10px 12px 4px}
+  .btn-bingo{width:100%;padding:18px;background:var(--accent);color:#111;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;letter-spacing:4px;text-transform:uppercase;cursor:pointer;display:none;animation:bingo-pop .4s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes bingo-pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .btn-bingo.visible{display:block}
+  .hint-text{padding:8px 16px 16px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
+
+  /* WIN OVERLAY */
+  #win-overlay{display:none;position:fixed;inset:0;background:rgba(17,17,17,.96);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px}
+  #win-overlay.active{display:flex}
+  .win-icon{font-size:72px;animation:bounce .5s ease infinite alternate}
+  @keyframes bounce{to{transform:translateY(-12px)}}
+  .win-title{font-family:'Unbounded',sans-serif;font-size:32px;font-weight:900;color:var(--accent);text-align:center;text-transform:uppercase}
+  .win-sub{color:var(--muted);text-align:center;font-size:15px;line-height:1.6}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);border-radius:30px;padding:11px 22px;font-size:13px;font-weight:600;z-index:200;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* TRACK FLASH */
+  .track-flash{position:fixed;top:0;left:0;right:0;background:var(--card);border-bottom:2px solid var(--accent);padding:12px 20px;z-index:50;transform:translateY(-100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+  .track-flash.show{transform:translateY(0)}
+  .tf-lbl{font-size:9px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px}
+  .tf-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700}
+
+  .confetti-piece{position:fixed;pointer-events:none;z-index:150;animation:cffall 1.5s ease-in forwards}
+  @keyframes cffall{0%{transform:translateY(-40px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="app-header">
+    <div class="logo">Музыкальное <span>Лото</span></div>
+    <div style="font-size:11px;color:var(--muted)">ДОМА</div>
+  </div>
+  <div class="home-hero">
+    <div class="vinyl-wrap"><div class="vinyl"></div><div class="vinyl-c"></div></div>
+    <div style="font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px">80 треков · 2000-е</div>
+    <div class="home-title">Играй без<br><em>распечаток</em></div>
+    <div class="home-sub">Ведущий включает музыку. Система сама отмечает треки на бланке. Первый кто соберёт линию — БИНГО!</div>
+  </div>
+  <div class="home-actions">
+    <button class="btn btn-y" onclick="showCreate()">🎮 Создать игру (ведущий)</button>
+    <button class="btn btn-o" onclick="showJoin()">🎵 Войти в игру (игрок)</button>
+  </div>
+</div>
+
+<!-- CREATE -->
+<div id="screen-create" class="screen">
+  <div class="app-header">
+    <div class="logo">Новая <span>игра</span></div>
+    <button class="x-btn" onclick="goHome()">×</button>
+  </div>
+  <div class="form-inner">
+    <div class="code-box">
+      <div class="code-lbl">Код для игроков</div>
+      <div class="code-val" id="room-code-display">----</div>
+      <div class="code-hint">Скажите этот код всем участникам</div>
+    </div>
+    <div>
+      <label class="f-label">Ваше имя (ведущий)</label>
+      <input class="f-input" id="host-name" value="Ведущий" placeholder="Имя">
+    </div>
+    <div>
+      <label class="f-label">Условие победы</label>
+      <div class="win-options" id="win-options">
+        <div class="win-opt selected" data-val="h" onclick="selectWin(this)">
+          <div class="win-opt-radio"></div>
+          <div><div class="win-opt-text">1 горизонтальная линия</div><div class="win-opt-sub">Любая строка полностью закрыта</div></div>
+        </div>
+        <div class="win-opt" data-val="v" onclick="selectWin(this)">
+          <div class="win-opt-radio"></div>
+          <div><div class="win-opt-text">1 вертикальная линия</div><div class="win-opt-sub">Любой столбец полностью закрыт</div></div>
+        </div>
+        <div class="win-opt" data-val="hv" onclick="selectWin(this)">
+          <div class="win-opt-radio"></div>
+          <div><div class="win-opt-text">Горизонталь + вертикаль</div><div class="win-opt-sub">Одна строка И один столбец</div></div>
+        </div>
+        <div class="win-opt" data-val="full" onclick="selectWin(this)">
+          <div class="win-opt-radio"></div>
+          <div><div class="win-opt-text">Весь бланк закрыт</div><div class="win-opt-sub">Все 36 треков отмечены</div></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-y" onclick="startHost()" style="margin-top:auto">▶ Начать игру</button>
+  </div>
+</div>
+
+<!-- JOIN -->
+<div id="screen-join" class="screen">
+  <div class="app-header">
+    <div class="logo">Войти в <span>игру</span></div>
+    <button class="x-btn" onclick="goHome()">×</button>
+  </div>
+  <div class="form-inner">
+    <div>
+      <label class="f-label">Код комнаты</label>
+      <input class="f-input" id="join-code" placeholder="0000" maxlength="4"
+        style="letter-spacing:10px;font-family:'Unbounded';font-size:32px;text-align:center;text-transform:uppercase">
+    </div>
+    <div>
+      <label class="f-label">Ваше имя</label>
+      <input class="f-input" id="player-name" placeholder="Имя игрока">
+    </div>
+    <button class="btn btn-y" onclick="joinGame()" style="margin-top:auto">Войти →</button>
+  </div>
+</div>
+
+<!-- HOST GAME -->
+<div id="screen-host" class="screen">
+  <div class="sticky-top">
+    <div class="host-topbar">
+      <div class="code-pill" id="h-code">----</div>
+      <div class="players-pill" id="h-players">👥 0</div>
+    </div>
+    <div class="win-pill">Победа: <span id="h-win-mode">—</span></div>
+    <div class="now-playing">
+      <div class="np-eye">🎵 Сейчас играет</div>
+      <div class="np-track" id="np-track">Нажмите «Следующий трек»</div>
+      <div class="np-num" id="np-num">Трек 0 из 80</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="np-prog" style="width:0%"></div></div>
+    <div class="host-ctrl">
+      <button class="btn-next" onclick="nextTrack()">⏭ Следующий трек</button>
+      <button class="btn-exit" onclick="goHome()">✕</button>
+    </div>
+  </div>
+  <div class="spotify-wrap">
+    <div style="font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">🎧 Плейлист Spotify</div>
+    <iframe src="https://open.spotify.com/embed/playlist/2xwaiFr95NUx7fFJzh25lQ?utm_source=generator&theme=0"
+      width="100%" height="180" frameBorder="0"
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      style="border-radius:10px;border:1px solid var(--border);display:block"></iframe>
+  </div>
+  <div class="sec-head">Сыграно треков</div>
+  <div class="played-list" id="played-list"></div>
+</div>
+
+<!-- PLAYER GAME -->
+<div id="screen-player" class="screen">
+  <div class="player-top">
+    <div class="name-pill" id="p-name">Игрок</div>
+    <div class="room-pill" id="p-room">----</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="s-hit">0</div><div class="stat-lbl">отмечено</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-played">0</div><div class="stat-lbl">сыграно</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-left">80</div><div class="stat-lbl">осталось</div></div>
+  </div>
+  <div class="win-mode-bar">Победа: <b id="p-win-mode">—</b></div>
+  <div class="cur-track" id="cur-track">
+    <div class="ct-lbl">🎵 Текущий трек</div>
+    <div class="ct-name" id="ct-name"></div>
+  </div>
+  <div class="bingo-grid" id="bingo-grid"></div>
+  <div class="bingo-wrap">
+    <button class="btn-bingo" id="bingo-btn" onclick="claimBingo()">🏆 БИНГО!</button>
+  </div>
+  <div class="hint-text">Треки отмечаются автоматически<br>Соберите условие победы и нажмите БИНГО!</div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div id="win-overlay">
+  <div class="win-icon">🏆</div>
+  <div class="win-title" id="win-title">БИНГО!</div>
+  <div class="win-sub" id="win-sub">Победитель определён!</div>
+  <button class="btn btn-y" style="max-width:280px;margin-top:8px" onclick="closeWin()">🎉 Новая игра</button>
+</div>
+
+<div class="track-flash" id="track-flash">
+  <div class="tf-lbl">Новый трек</div>
+  <div class="tf-name" id="tf-name">—</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TRACKS = [
+  "Алёна Алина — Электричка","Руки Вверх! — Крошка моя","Ласковый Май — Белые Розы",
+  "Банд'Эрос — Про красивую жизнь","Верка Сердючка — Гулянка","Quest Pistols — Я твой наркотик",
+  "Валерий Меладзе — Сэра","Мираж — Музыка нас связала","t.A.T.u. — Нас не догонят",
+  "Олег Газманов — Есаул","Катя Лель — Мой мармеладный","Звери — Южная ночь",
+  "Игорь Николаев — Выпьем за любовь","Дискотека Авария — Малинки","t.A.T.u. — Я сошла с ума",
+  "Haddaway — What is Love","Король и Шут — Кукла колдуна","Комбинация — American Boy",
+  "Иванушки International — Снегири","Натали — О, Боже, какой мужчина","Мумий Тролль — Утекай",
+  "Шура — Ты не верь слезам","Земфира — ромашки","5sta Family — Я буду",
+  "Вирус — Ты меня не ищи","Los Del Rio — Macarena","Чичерина — Ту-лу-ла",
+  "REFLEX — Танцы","Иванушки International — Тополиный пух","Серёга — Чёрный бумер",
+  "Сплин — Выхода нет","Гости из будущего — Беги от меня","Дискотека Авария — Пей пиво!",
+  "Андрей Губин — Ночь","Quest Pistols — Ты так красива","Блестящие — За четыре моря",
+  "Демо — Солнышко","Валерий Меладзе — Небеса","Мумий Тролль — Владивосток 2000",
+  "Натали — Ветер с моря дул","DJ SMASH — Волна","ВИА ГРА — Стоп! Стоп! Стоп!",
+  "Руки Вверх! — Ай-яй-яй","Братья Грим — Ресницы","Дмитрий Маликов — Ты одна, ты такая",
+  "Градусы — Режиссер","Zdob și Zdub — Видели ночь","Лада Дэнс — Baby Tonight",
+  "ВИА ГРА — Я не поняла","Boney M. — Rasputin","Гости из будущего — Ты где-то",
+  "Андрей Губин — Мальчик бродяга","Дискотека Авария — Небо","Тимати feat. DJ Dlee — В клубе",
+  "Мираж — Наступает ночь","Paradisio — Bailando","Акула — Кислотный DJ",
+  "Комбинация — Бухгалтер","Верка Сердючка — Дольче Габбана","Мумий Тролль — Медведица",
+  "Hi-Fi — Беспризорник","Фабрика — Про любовь","Руки Вверх — Он тебя целует",
+  "Quest Pistols — Белая стрекоза любви","Ирина Аллегрова — Угонщица","Кино — Кончится лето",
+  "Шура — Твори добро","Ласковый май — Седая Ночь","КАР-МЭН — Сан-Франциско",
+  "Демо — 2000 Лет","Братья Грим — Кустурица","Ирина Аллегрова — Императрица",
+  "Надежда Кадышева — Широка река","Женя Белоусов — Подари мне вечерок",
+  "Леприконсы — Хали-Гали, Паратрупер","Верка Сердючка — Всё будет хорошо",
+  "Дискотека Авария — Если хочешь остаться","Hi-Fi — Не дано","Бьянка — Были танцы",
+  "Катя Лель — Муси-Пуси"
+];
+
+const WIN_LABELS = {
+  h: '1 горизонтальная линия',
+  v: '1 вертикальная линия',
+  hv: 'Горизонталь + вертикаль',
+  full: 'Весь бланк закрыт'
+};
+
+let G = {
+  roomCode: null, mode: null, playerName: null,
+  card: [], marked: new Set(),
+  winMode: 'h',
+  game: null
+};
+
+// Shared game state (same tab demo)
+let sharedGame = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function goHome() {
+  if (sharedGame && sharedGame._poll) clearInterval(sharedGame._poll);
+  sharedGame = null; G.marked = new Set();
+  showScreen('home');
+}
+
+function selectWin(el) {
+  document.querySelectorAll('.win-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  G.winMode = el.dataset.val;
+}
+
+function showCreate() {
+  const code = Math.random().toString(36).slice(2,6).toUpperCase();
+  G.roomCode = code;
+  document.getElementById('room-code-display').textContent = code;
+  showScreen('create');
+}
+
+function showJoin() { showScreen('join'); }
+
+function startHost() {
+  G.mode = 'host';
+  G.playerName = document.getElementById('host-name').value || 'Ведущий';
+  sharedGame = { shuffled: shuffle([...TRACKS]), idx: -1, played: [], winMode: G.winMode };
+  document.getElementById('h-code').textContent = G.roomCode;
+  document.getElementById('h-players').textContent = '👥 0';
+  document.getElementById('h-win-mode').textContent = WIN_LABELS[G.winMode];
+  document.getElementById('played-list').innerHTML = '';
+  document.getElementById('np-track').textContent = 'Нажмите «Следующий трек»';
+  document.getElementById('np-num').textContent = 'Трек 0 из ' + TRACKS.length;
+  document.getElementById('np-prog').style.width = '0%';
+  showScreen('host');
+  toast('🎮 Код игры: ' + G.roomCode);
+}
+
+function nextTrack() {
+  if (!sharedGame) return;
+  sharedGame.idx++;
+  if (sharedGame.idx >= sharedGame.shuffled.length) { toast('🎉 Все треки сыграны!'); return; }
+  const track = sharedGame.shuffled[sharedGame.idx];
+  sharedGame.played.push(track);
+  const n = sharedGame.idx + 1, total = sharedGame.shuffled.length;
+  document.getElementById('np-track').textContent = track;
+  document.getElementById('np-num').textContent = 'Трек ' + n + ' из ' + total;
+  document.getElementById('np-prog').style.width = (n/total*100) + '%';
+  const list = document.getElementById('played-list');
+  const el = document.createElement('div');
+  el.className = 'played-item';
+  el.innerHTML = `<span class="played-n">${n}</span><span class="played-name">${track}</span>`;
+  list.insertBefore(el, list.firstChild);
+  flashTrack(track);
+  // Auto-mark on player card
+  autoMarkTrack(track);
+}
+
+function joinGame() {
+  const code = document.getElementById('join-code').value.toUpperCase().trim();
+  const name = document.getElementById('player-name').value.trim() || 'Игрок';
+  if (code.length < 3) { toast('Введите код комнаты'); return; }
+  G.mode = 'player'; G.roomCode = code; G.playerName = name;
+  G.marked = new Set();
+  // Get win mode from shared game or default
+  G.winMode = sharedGame ? sharedGame.winMode : 'h';
+  // Generate 36 random tracks from 80
+  G.card = shuffle([...TRACKS]).slice(0, 36);
+  document.getElementById('p-name').textContent = name;
+  document.getElementById('p-room').textContent = code;
+  document.getElementById('p-win-mode').textContent = WIN_LABELS[G.winMode];
+  renderGrid();
+  updateStats();
+  showScreen('player');
+  toast('✅ Вы в игре!');
+  // Init shared game if joining fresh
+  if (!sharedGame) sharedGame = { shuffled: shuffle([...TRACKS]), idx: -1, played: [], winMode: G.winMode };
+  // Poll for new tracks
+  let last = sharedGame.idx;
+  sharedGame._poll = setInterval(() => {
+    if (sharedGame && sharedGame.idx > last) {
+      last = sharedGame.idx;
+      updateStats();
+    }
+  }, 300);
+}
+
+function renderGrid() {
+  const grid = document.getElementById('bingo-grid');
+  grid.innerHTML = '';
+  G.card.forEach((t, i) => {
+    const c = document.createElement('div');
+    c.className = 'bingo-cell';
+    c.id = 'cell' + i;
+    // Short display: artist on first line, song on second
+    const parts = t.split(' — ');
+    c.innerHTML = `<span>${parts[0]}</span>${parts[1] ? `<br><span style="color:var(--muted)">${parts[1]}</span>` : ''}`;
+    grid.appendChild(c);
+  });
+}
+
+// AUTO-MARK: called when host plays a track
+function autoMarkTrack(track) {
+  if (G.mode !== 'player') return;
+  G.card.forEach((t, i) => {
+    if (t === track && !G.marked.has(i)) {
+      G.marked.add(i);
+      const cell = document.getElementById('cell' + i);
+      if (cell) {
+        cell.classList.add('hit');
+        cell.style.transform = 'scale(1.1)';
+        setTimeout(() => cell.style.transform = '', 300);
+      }
+    }
+  });
+  // Show current track
+  const ct = document.getElementById('cur-track');
+  if (ct) { ct.style.display = 'block'; document.getElementById('ct-name').textContent = track; }
+  updateStats();
+  checkBingo();
+}
+
+function updateStats() {
+  document.getElementById('s-hit').textContent = G.marked.size;
+  const p = sharedGame ? sharedGame.played.length : 0;
+  document.getElementById('s-played').textContent = p;
+  document.getElementById('s-left').textContent = TRACKS.length - p;
+}
+
+// WIN CHECK
+function getHLines() { // horizontal lines
+  const lines = [];
+  for (let r=0; r<6; r++) lines.push([...Array(6)].map((_,c) => r*6+c));
+  return lines;
+}
+function getVLines() { // vertical lines
+  const lines = [];
+  for (let c=0; c<6; c++) lines.push([...Array(6)].map((_,r) => r*6+c));
+  return lines;
+}
+
+function checkBingo() {
+  const mode = G.winMode;
+  let won = false;
+  let winCells = [];
+
+  if (mode === 'h') {
+    for (const line of getHLines()) {
+      if (line.every(i => G.marked.has(i))) { won = true; winCells = line; break; }
+    }
+  } else if (mode === 'v') {
+    for (const line of getVLines()) {
+      if (line.every(i => G.marked.has(i))) { won = true; winCells = line; break; }
+    }
+  } else if (mode === 'hv') {
+    let hLine = null, vLine = null;
+    for (const line of getHLines()) { if (line.every(i => G.marked.has(i))) { hLine = line; break; } }
+    for (const line of getVLines()) { if (line.every(i => G.marked.has(i))) { vLine = line; break; } }
+    if (hLine && vLine) { won = true; winCells = [...new Set([...hLine, ...vLine])]; }
+  } else if (mode === 'full') {
+    if (G.marked.size >= 36) { won = true; winCells = [...Array(36).keys()]; }
+  }
+
+  if (won) {
+    winCells.forEach(i => {
+      const c = document.getElementById('cell' + i);
+      if (c) c.classList.add('winner');
+    });
+    document.getElementById('bingo-btn').classList.add('visible');
+  }
+}
+
+function claimBingo() {
+  confetti();
+  document.getElementById('win-title').textContent = '🏆 БИНГО!';
+  document.getElementById('win-sub').textContent = G.playerName + ' победил(а)!\n' + WIN_LABELS[G.winMode];
+  document.getElementById('win-overlay').classList.add('active');
+}
+
+function closeWin() {
+  document.getElementById('win-overlay').classList.remove('active');
+  goHome();
+}
+
+function flashTrack(track) {
+  const f = document.getElementById('track-flash');
+  document.getElementById('tf-name').textContent = track;
+  f.classList.add('show');
+  setTimeout(() => f.classList.remove('show'), 2500);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function confetti() {
+  const colors = ['#f5c842','#ffffff','#111111','#d4a820','#aaaaaa'];
+  for (let i=0; i<55; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;top:-20px;background:${colors[~~(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()}s`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }, i*28);
+  }
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1; i>0; i--) { const j=~~(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+</script>
+</body>
+</html>
