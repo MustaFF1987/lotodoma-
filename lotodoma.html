@@ -61,7 +61,7 @@
   .btn-next{flex:1;padding:14px;background:var(--accent);color:#111;border:none;border-radius:var(--radius);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
   .btn-next:active{opacity:.8}
   .btn-exit{padding:14px 16px;background:var(--card);color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:18px}
-  .spotify-wrap{padding:0 16px 12px}
+  
   .sec-head{padding:4px 16px 8px;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
   .played-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:6px}
   .played-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
@@ -83,10 +83,10 @@
   .cur-track{margin:6px 12px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);display:none}
   .ct-lbl{font-size:9px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
   .ct-name{font-size:13px;font-weight:600}
-  .bingo-grid{display:grid;grid-template-columns:repeat(6,1fr) !important;gap:3px;padding:4px 8px}
-  .bingo-cell{aspect-ratio:1/1.2;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px;color:var(--text);user-select:none;position:relative;transition:all .2s;overflow:hidden}
-  .bingo-cell .artist{font-size:6.5px;font-weight:700;line-height:1.2;color:var(--text);word-break:break-word;hyphens:auto}
-  .bingo-cell .song{font-size:5.5px;color:var(--muted);line-height:1.2;margin-top:1px;word-break:break-word}
+  .bingo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:4px 6px}
+  .bingo-cell{aspect-ratio:1/1.4;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px 2px;color:var(--text);user-select:none;position:relative;transition:all .2s;overflow:hidden}
+  .bingo-cell .artist{font-size:9px;font-weight:700;line-height:1.3;color:var(--text);word-break:break-word;hyphens:auto}
+  .bingo-cell .song{font-size:8px;color:var(--muted);line-height:1.3;margin-top:2px;word-break:break-word}
   .bingo-cell.hit{background:var(--hit);border-color:var(--accent)}
   .bingo-cell.hit .artist{color:var(--accent)}
   .bingo-cell.hit .song{color:var(--accent);opacity:.7}
@@ -217,12 +217,13 @@
       <button class="btn-exit" onclick="goHome()">✕</button>
     </div>
   </div>
-  <div class="spotify-wrap">
-    <div style="font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">🎧 Плейлист Spotify</div>
-    <iframe src="https://open.spotify.com/embed/playlist/2xwaiFr95NUx7fFJzh25lQ?utm_source=generator&theme=0"
-      width="100%" height="180" frameBorder="0"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      style="border-radius:10px;border:1px solid var(--border);display:block"></iframe>
+
+  <div style="padding:0 16px 12px">
+    <div style="font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">🎵 ПЛЕЕР</div>
+    <div id="yt-player-wrap" style="border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#000;display:none">
+      <div id="yt-player"></div>
+    </div>
+    <div id="yt-status" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center"></div>
   </div>
   <div class="sec-head">Игроки онлайн</div>
   <div class="players-list" id="players-list"></div>
@@ -280,6 +281,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
@@ -420,38 +422,39 @@ window.startHost = function() {
 }
 
 window.nextTrack = function() {
-  if (G._nextBusy) return;
-  G._nextBusy = true;
-  setTimeout(() => G._nextBusy = false, 1000);
-
-  G.currentTrackIndex = (G.currentTrackIndex || -1) + 1;
+  G.currentTrackIndex = (G.currentTrackIndex !== undefined ? G.currentTrackIndex : -1) + 1;
   const nextIdx = G.currentTrackIndex;
 
-  if (nextIdx >= G.shuffledTracks.length) { toast('🎉 Все треки сыграны!'); G._nextBusy = false; return; }
+  if (nextIdx >= G.shuffledTracks.length) { toast('🎉 Все треки сыграны!'); return; }
   const track = G.shuffledTracks[nextIdx];
   const n = nextIdx + 1;
 
-  db.ref(`rooms/${G.roomCode}`).update({
+  db.ref('rooms/' + G.roomCode).update({
     currentTrackIndex: nextIdx,
     currentTrack: track,
     playedCount: n,
     status: 'playing'
+  }).catch(err => {
+    toast('⚠️ Ошибка: ' + err.message);
+    G.currentTrackIndex--;
   });
 
   document.getElementById('np-track').textContent = track;
-  document.getElementById('np-num').textContent = `Трек ${n} из ${TRACKS.length}`;
+  document.getElementById('np-num').textContent = 'Трек ' + n + ' из ' + TRACKS.length;
   document.getElementById('np-prog').style.width = (n/TRACKS.length*100) + '%';
 
-  // Only add to list if not already shown
-  if (n > (G.lastDisplayedIdx || 0)) {
-    G.lastDisplayedIdx = n;
-    const list = document.getElementById('played-list');
-    const el = document.createElement('div');
-    el.className = 'played-item';
-    el.innerHTML = `<span class="played-n">${n}</span><span class="played-name">${track}</span>`;
-    list.insertBefore(el, list.firstChild);
-  }
+  const list = document.getElementById('played-list');
+  const el = document.createElement('div');
+  el.className = 'played-item';
+  el.innerHTML = '<span class="played-n">' + n + '</span><span class="played-name">' + track + '</span>';
+  list.insertBefore(el, list.firstChild);
+
   flashTrack(track);
+
+  // Auto-play on YouTube
+  if (G.mode === 'host') {
+    searchAndPlay(track);
+  }
 }
 
 // ---- PLAYER ----
@@ -631,6 +634,73 @@ function showWinOverlay(winnerName) {
 window.closeWin = function() {
   document.getElementById('win-overlay').classList.remove('active');
   goHome();
+}
+
+// ========== YOUTUBE PLAYER ==========
+const YT_API_KEY = 'AIzaSyChhAm292saJen85Lghv9bIlNLjMnSnT-Q';
+let ytPlayer = null;
+let ytReady = false;
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  ytPlayer = new YT.Player('yt-player', {
+    height: '160',
+    width: '100%',
+    playerVars: {
+      autoplay: 1,
+      controls: 1,
+      rel: 0,
+      modestbranding: 1
+    },
+    events: {
+      onReady: function() {
+        document.getElementById('yt-player-wrap').style.display = 'block';
+      },
+      onError: function(e) {
+        document.getElementById('yt-status').textContent = '⚠️ Видео недоступно, ищем другое...';
+        searchAndPlay(G._lastSearchQuery, G._lastSearchSkip + 1);
+      }
+    }
+  });
+};
+
+G._lastSearchQuery = '';
+G._lastSearchSkip = 0;
+
+function searchAndPlay(query, skipIndex) {
+  skipIndex = skipIndex || 0;
+  G._lastSearchQuery = query;
+  G._lastSearchSkip = skipIndex;
+
+  const status = document.getElementById('yt-status');
+  if (status) status.textContent = '🔍 Ищем: ' + query;
+
+  fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + 
+    encodeURIComponent(query + ' official audio') + 
+    '&type=video&maxResults=' + (skipIndex + 3) + 
+    '&key=' + YT_API_KEY)
+  .then(r => r.json())
+  .then(data => {
+    if (data.items && data.items.length > skipIndex) {
+      const videoId = data.items[skipIndex].id.videoId;
+      const title = data.items[skipIndex].snippet.title;
+      if (status) status.textContent = '▶ ' + title;
+      if (ytPlayer && ytReady) {
+        ytPlayer.loadVideoById(videoId);
+      } else {
+        // Player not ready yet, wait
+        setTimeout(() => {
+          if (ytPlayer) ytPlayer.loadVideoById(videoId);
+        }, 2000);
+      }
+    } else {
+      if (status) status.textContent = '❌ Не найдено: ' + query;
+    }
+  })
+  .catch(err => {
+    if (status) status.textContent = '❌ Ошибка поиска';
+    console.error(err);
+  });
 }
 
 function flashTrack(track) {
