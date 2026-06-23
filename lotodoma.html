@@ -219,10 +219,16 @@
   </div>
 
   <div style="padding:0 16px 12px">
-    <div id="yt-status" style="font-size:12px;color:var(--muted);margin-top:2px;text-align:center;padding:8px;background:var(--card);border-radius:8px;display:none"></div>
-    <a id="yt-link" href="#" target="_blank" style="display:none;margin-top:8px;padding:12px 16px;background:#ff0000;color:white;border-radius:8px;text-decoration:none;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-align:center">
-      ▶ ОТКРЫТЬ НА YOUTUBE
-    </a>
+    <div id="yt-player-wrap" style="display:none;border-radius:10px;overflow:hidden;background:#000;border:1px solid var(--border)">
+      <iframe id="yt-iframe"
+        width="100%" height="200"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+        style="display:block">
+      </iframe>
+    </div>
+    <div id="yt-status" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center;display:none"></div>
   </div>
   <div class="sec-head">Игроки онлайн</div>
   <div class="players-list" id="players-list"></div>
@@ -733,7 +739,8 @@ const PLAYLIST_MAP = {
 
 function playTrackOnYoutube(trackName) {
   const status = document.getElementById('yt-status');
-  const link = document.getElementById('yt-link');
+  const wrap = document.getElementById('yt-player-wrap');
+  const iframe = document.getElementById('yt-iframe');
 
   // Find video ID in playlist map
   let videoId = PLAYLIST_MAP[trackName];
@@ -750,21 +757,15 @@ function playTrackOnYoutube(trackName) {
     }
   }
 
-  const url = videoId
-    ? 'https://www.youtube.com/watch?v=' + videoId
-    : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(trackName);
-
-  if (link) {
-    link.href = url;
-    link.style.display = 'block';
-    link.textContent = '▶ ' + trackName;
+  if (videoId) {
+    // Embed directly - autoplay=1, no API needed!
+    const embedUrl = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1';
+    iframe.src = embedUrl;
+    wrap.style.display = 'block';
+    if (status) { status.style.display = 'block'; status.textContent = '🎵 ' + trackName; }
+  } else {
+    if (status) { status.style.display = 'block'; status.textContent = '❌ Не найдено: ' + trackName; }
   }
-  if (status) {
-    status.style.display = 'block';
-    status.textContent = videoId ? '✅ ' + trackName : '🔍 ' + trackName;
-  }
-
-  window.open(url, 'ytwindow');
 }
 
 function flashTrack(track) {
