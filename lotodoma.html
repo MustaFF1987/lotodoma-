@@ -463,11 +463,38 @@ window.startHost = function() {
     const players=snap.val()||{};
     document.getElementById('h-players').textContent='👥 '+Object.keys(players).length;
     const list=document.getElementById('players-list'); list.innerHTML='';
-    Object.values(players).forEach(p=>{const el=document.createElement('div');el.className='player-item';el.innerHTML='<span class="player-item-name">👤 '+p.name+'</span><span class="player-item-hits">'+(p.hits||0)+' треков</span>';list.appendChild(el);});
+    // Sort: bingo players first, then by hits
+    const sorted = Object.values(players).sort((a,b) => {
+      if (a.bingo && !b.bingo) return -1;
+      if (!a.bingo && b.bingo) return 1;
+      return (b.hits||0) - (a.hits||0);
+    });
+    sorted.forEach(p=>{
+      const el=document.createElement('div');
+      el.className='player-item';
+      if (p.bingo) el.style.borderLeft='3px solid #e63225';
+      el.innerHTML='<span class="player-item-name">'+(p.bingo?'🏆 ':'👤 ')+p.name+(p.bingo?' <span style="color:#e63225;font-size:11px;font-weight:700;font-family:Oswald">БИНГО!</span>':'')+'</span><span class="player-item-hits">'+(p.hits||0)+' треков</span>';
+      list.appendChild(el);
+    });
   });
   listeners.push(()=>pRef.off('value',u1));
   const wRef=db.ref('rooms/'+G.roomCode+'/winner');
-  const u2=wRef.on('value',snap=>{if(snap.val())showWinOverlay(snap.val().name);});
+  const u2=wRef.on('value',snap=>{
+    if(snap.val()) {
+      const winnerName = snap.val().name;
+      // Show winner banner on host screen
+      let banner = document.getElementById('winner-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'winner-banner';
+        banner.style.cssText = 'margin:0 16px 10px;padding:14px 16px;background:#e63225;border-radius:8px;text-align:center;font-family:Oswald,sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;animation:bingo-pop .4s cubic-bezier(.34,1.56,.64,1)';
+        const playedSection = document.querySelector('#screen-host .sec-head');
+        if (playedSection) playedSection.parentNode.insertBefore(banner, playedSection);
+      }
+      banner.textContent = '🏆 БИНГО! Победитель: ' + winnerName;
+      showWinOverlay(winnerName);
+    }
+  });
   listeners.push(()=>wRef.off('value',u2));
   showScreen('host'); toast('🎮 Код: '+G.roomCode);
 }
@@ -555,8 +582,12 @@ function checkBingo() {
 }
 
 window.claimBingo = function() {
-  if(checkBingo()){db.ref('rooms/'+G.roomCode+'/winner').set({name:G.playerName,playerId:G.playerId});confetti();showWinOverlay(G.playerName);}
-  else toast('❌ Нет полной линии!');
+  if(checkBingo()){
+    db.ref('rooms/'+G.roomCode+'/winner').set({name:G.playerName,playerId:G.playerId});
+    // Also mark player as bingo in players list so host sees it
+    if(G.playerId) db.ref('rooms/'+G.roomCode+'/players/'+G.playerId).update({bingo:true});
+    confetti();showWinOverlay(G.playerName);
+  } else toast('❌ Нет полной линии!');
 }
 
 function showWinOverlay(winnerName) {
